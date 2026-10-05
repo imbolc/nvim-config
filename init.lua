@@ -574,7 +574,8 @@ if plugin_loading_enabled then
 			python = { "ruff_format", "ruff_organize_imports" },
 			-- rust `injected` breaks Maud templates.
 			-- rust = { "rustfmt_nightly", "injected" },
-			rust = { "rustfmt_nightly" },
+			-- Format Rust normally before formatting Topcoat macros in opted-in projects.
+			rust = { "rustfmt_nightly", "topcoat" },
 			sh = { "shfmt" },
 			-- sql = { "sleek" },
 			toml = { "taplo" },
@@ -610,6 +611,14 @@ if plugin_loading_enabled then
 				command = "rustup",
 				args = { "run", "nightly", "rustfmt", "--emit", "stdout" },
 				stdin = true,
+			},
+			topcoat = {
+				-- Format macro bodies only in projects with a Topcoat.toml marker, after rustfmt has formatted the Rust code.
+				command = "topcoat",
+				args = { "fmt", "--stdin" },
+				stdin = true,
+				cwd = require("conform.util").root_file({ "Topcoat.toml" }),
+				require_cwd = true,
 			},
 			rumdl = {
 				-- Emit only formatted Markdown and let rumdl resolve user or project settings for the buffer.
@@ -797,9 +806,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		map("n", "gr", vim.lsp.buf.references)
 		map("n", "<leader>e", vim.diagnostic.open_float)
 		map("n", "<leader>q", vim.diagnostic.setloclist)
-		-- Use <leader>lf for LSP formatting to avoid clashing with file finder.
+		-- Use the format-on-save chain for manual formatting, with LSP fallback for other filetypes.
 		map("n", "<leader>lf", function()
-			vim.lsp.buf.format({ async = true })
+			require("conform").format({ async = true, lsp_format = "fallback" })
 		end)
 	end,
 })
