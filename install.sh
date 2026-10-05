@@ -46,4 +46,4 @@ cargo install --locked sleek # formatter
 # Rust
 rustup component add rust-analyzer
 rustup component add rustfmt --toolchain nightly
-cargo install --locked cargo-limit
+cargo install --locked topcoat-cli

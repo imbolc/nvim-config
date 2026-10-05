@@ -27,8 +27,8 @@ return {
 				-- allFeatures = true,
 			},
 			rustfmt = {
-				-- Pipe rustfmt output through dx fmt so Rust files are post-processed with dx formatting rules.
-				overrideCommand = { "sh", "-c", "rustfmt --edition 2024 --emit stdout | dx fmt -f -" },
+				-- Use rustfmt directly for Rust 2024 formatting in LSP requests.
+				overrideCommand = { "rustfmt", "--edition", "2024", "--emit", "stdout" },
 			},
 		},
 	},

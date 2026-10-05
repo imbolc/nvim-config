@@ -606,9 +606,9 @@ if plugin_loading_enabled then
 				stdin = true,
 			},
 			rustfmt_nightly = {
-				-- Run rustfmt from nightly and enable pipefail so markdown code fences stay unchanged when rustfmt rejects a snippet.
-				command = "sh",
-				args = { "-o", "pipefail", "-c", "rustup run nightly rustfmt --emit stdout | dx fmt -f -" },
+				-- Use nightly rustfmt directly for normal Rust formatting in buffers and Markdown code fences.
+				command = "rustup",
+				args = { "run", "nightly", "rustfmt", "--emit", "stdout" },
 				stdin = true,
 			},
 			rumdl = {
