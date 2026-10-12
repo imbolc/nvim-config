@@ -10,7 +10,6 @@ vim.opt.spell = true
 vim.opt.spelllang = "en,ru"
 
 -- Backup
-vim.opt.backup = false
 vim.opt.writebackup = false
 vim.opt.swapfile = false
 
@@ -28,7 +27,6 @@ vim.api.nvim_command("autocmd ColorScheme * highlight VertSplit guibg=bg guifg=w
 
 -- Wrapping
 vim.opt.wrap = false -- disable soft wrapping at the edge of the screen
-vim.opt.textwidth = 0 -- disable hard wrapping
 vim.opt.linebreak = true -- do not wrap in the middle of a word when soft wrapping is enabled
 vim.opt.breakindent = true -- preserve indentation of softly wrapped lines
 -- move through softly wrapped lines more naturally
@@ -40,7 +38,6 @@ vim.opt.ignorecase = true
 vim.opt.smartcase = true
 vim.opt.inccommand = "split" -- preview substitutions
 vim.opt.gdefault = true
-vim.opt.incsearch = true
 
 -- Indentation
 vim.opt.expandtab = true
@@ -111,11 +108,8 @@ function FilePathComplete(findstart, base)
 	return { words = matches, refresh = "always" }
 end
 
--- Add the path source once so re-sourcing init.lua does not duplicate completion work.
-local file_path_complete_source = "Fv:lua.FilePathComplete"
-if not vim.tbl_contains(vim.opt.complete:get(), file_path_complete_source) then
-	vim.opt.complete:append(file_path_complete_source)
-end
+-- Neovim deduplicates completion sources, so re-sourcing keeps a single path source.
+vim.opt.complete:append("Fv:lua.FilePathComplete")
 
 -- Enable built-in LSP completion on attach so native completion and manual omni-complete can use server results.
 vim.api.nvim_create_autocmd("LspAttach", {
@@ -129,8 +123,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
 	end,
 })
 
--- Smart Tab for completion: trigger/navigate or insert tab
-function InsertTabWrapper()
+-- Keep context-sensitive Tab completion; expression mappings expand the returned keycodes.
+vim.keymap.set("i", "<Tab>", function()
 	local completion = vim.fn.complete_info({ "mode", "pum_visible", "items" })
 	local col = vim.fn.col(".") - 1
 	local line = vim.fn.getline(".")
@@ -149,20 +143,18 @@ function InsertTabWrapper()
 	local is_path_context = before_cursor:match("%S*[/.~]%S*$") ~= nil
 	if is_path_context and completion.mode ~= "files" and not has_path_items then
 		local close_popup = completion.pum_visible == 1 and "<C-e>" or ""
-		return vim.api.nvim_replace_termcodes(close_popup .. "<C-x><C-f><C-n>", true, true, true)
+		return close_popup .. "<C-x><C-f><C-n>"
 	end
 
 	if completion.pum_visible == 1 then
-		return vim.api.nvim_replace_termcodes("<C-n>", true, true, true)
+		return "<C-n>"
 	end
 	if col == 0 or line:sub(col, col):match("%s") then
-		return vim.api.nvim_replace_termcodes("<Tab>", true, true, true)
+		return "<Tab>"
 	else
-		return vim.api.nvim_replace_termcodes("<C-x><C-o>", true, true, true)
+		return "<C-x><C-o>"
 	end
-end
-
-vim.keymap.set("i", "<Tab>", "v:lua.InsertTabWrapper()", { expr = true, silent = true })
+end, { expr = true, silent = true })
 vim.keymap.set("i", "<S-Tab>", function()
 	return vim.fn.pumvisible() == 1 and "<C-p>" or "<S-Tab>"
 end, { expr = true, silent = true })
@@ -258,11 +250,6 @@ vim.api.nvim_create_autocmd("BufNewFile", {
 	pattern = "*.sh",
 	desc = "Load skeleton for shell scripts",
 	command = "0r ~/.config/nvim/templates/skeleton.sh",
-})
-
-vim.diagnostic.config({
-	-- single-line errors
-	virtual_text = true,
 })
 
 --------------------------------
@@ -396,46 +383,6 @@ vim.api.nvim_create_autocmd("VimEnter", {
 	end,
 })
 
--- Auto change theme
-function AutoTheme()
-	local file = vim.fn.expand("~/.config/nvim/theme.lua")
-	vim.system({ "touch", file })
-
-	local event = vim.loop.new_fs_event()
-	event:start(
-		file,
-		{},
-		vim.schedule_wrap(function(err, _, events)
-			if err then
-				vim.notify("Error watching theme file: " .. err, vim.log.levels.ERROR)
-				event:stop()
-				return
-			end
-			if events.change then
-				-- Ignore early writes until plugins are loaded so theme files cannot request package colorschemes before vim.pack adds them.
-				if not vim.g.theme_reload_enabled then
-					return
-				end
-
-				-- Load theme changes defensively so a bad theme edit reports an error without breaking startup.
-				local ok, err_msg = pcall(dofile, file)
-				if not ok then
-					vim.notify("Error loading theme file: " .. err_msg, vim.log.levels.ERROR)
-				end
-			end
-		end)
-	)
-
-	vim.api.nvim_create_autocmd("VimLeavePre", {
-		callback = function()
-			if event then
-				event:stop()
-			end
-		end,
-	})
-end
-AutoTheme()
-
 -------------
 -- Plugins --
 -------------
@@ -455,7 +402,6 @@ local plugins = {
 	{ src = "https://github.com/ibhagwan/fzf-lua" },
 	{ src = "https://github.com/j-hui/fidget.nvim" },
 	{ src = "https://github.com/nativerv/cyrillic.nvim" },
-	{ src = "https://github.com/mason-org/mason.nvim" },
 }
 
 -- Respect --noplugin by skipping package installation, loading, and plugin-specific setup when plugin loading is disabled.
@@ -470,40 +416,24 @@ local deferred_plugins = {
 if plugin_loading_enabled then
 	vim.api.nvim_create_autocmd("PackChanged", {
 		callback = function(ev)
-			-- Recreate Lazy's build hooks for native packages so plugin installs and updates refresh their generated data.
-			local kind = ev.data and ev.data.kind or nil
-			local name = ev.data and ev.data.spec and ev.data.spec.name or nil
-			if kind ~= "install" and kind ~= "update" then
+			-- Keep installed parsers compatible when nvim-treesitter is installed or updated.
+			local name, kind = ev.data.spec.name, ev.data.kind
+			if name ~= "nvim-treesitter" or (kind ~= "install" and kind ~= "update") then
 				return
 			end
 
-			if name == "nvim-treesitter" then
-				vim.schedule(function()
-					-- Run nvim-treesitter's parser update after package changes so managed parsers stay compatible with the plugin.
-					if pcall(vim.cmd, "packadd nvim-treesitter") then
-						pcall(vim.cmd, "TSUpdate")
-					end
-				end)
-			elseif name == "mason.nvim" and #vim.api.nvim_list_uis() > 0 then
-				vim.schedule(function()
-					-- Refresh Mason's registry after package changes so interactive installs use current package metadata.
-					if pcall(vim.cmd, "packadd mason.nvim") then
-						pcall(vim.cmd, "MasonUpdate")
-					end
-				end)
-			end
+			vim.schedule(function()
+				if pcall(vim.cmd, "packadd nvim-treesitter") then
+					pcall(vim.cmd, "TSUpdate")
+				end
+			end)
 		end,
 	})
 
-	-- Install missing plugins without an interactive prompt and load non-headless plugins immediately for the setup below.
+	-- Install missing plugins without a prompt and load eager plugins for the setup below.
 	vim.pack.add(plugins, {
 		confirm = false,
 		load = function(plugin)
-			-- Keep Mason managed by vim.pack but inactive in headless checks, matching the previous Lazy enabled guard.
-			if plugin.spec.name == "mason.nvim" and #vim.api.nvim_list_uis() == 0 then
-				return
-			end
-
 			-- Let explicit autocmds below load deferred packages only when their old Lazy events would have run.
 			if deferred_plugins[plugin.spec.name] then
 				return
@@ -517,16 +447,43 @@ if plugin_loading_enabled then
 	-- Load the configured colorscheme after vim.pack makes the theme package available.
 	vim.cmd([[colorscheme PaperColorSlim]])
 
-	-- Enable theme reloads after vim.pack loads colorscheme packages, then apply the current theme file once.
-	vim.g.theme_reload_enabled = true
+	-- Load and watch the persisted theme after colorscheme packages are available.
 	local theme_file = vim.fn.expand("~/.config/nvim/theme.lua")
-	if vim.fn.filereadable(theme_file) == 1 then
-		-- Apply the user's persisted theme now that PaperColorSlim variants are on the runtime path.
+	if vim.fn.filereadable(theme_file) == 0 then
+		-- Create the file before watching it so changes also work on a fresh installation.
+		vim.fn.writefile({}, theme_file, "a")
+	end
+	local function load_theme()
+		-- Report invalid theme edits without breaking startup or later reloads.
 		local ok, err_msg = pcall(dofile, theme_file)
 		if not ok then
 			vim.notify("Error loading theme file: " .. err_msg, vim.log.levels.ERROR)
 		end
 	end
+	local theme_watcher = assert(vim.uv.new_fs_event())
+	local ok, err = theme_watcher:start(
+		theme_file,
+		{},
+		vim.schedule_wrap(function(watch_err, _, events)
+			if watch_err then
+				vim.notify("Error watching theme file: " .. watch_err, vim.log.levels.ERROR)
+				theme_watcher:stop()
+			elseif events.change then
+				load_theme()
+			end
+		end)
+	)
+	if not ok then
+		vim.notify("Error watching theme file: " .. err, vim.log.levels.ERROR)
+	end
+	vim.api.nvim_create_autocmd("VimLeavePre", {
+		once = true,
+		callback = function()
+			-- Closing the watcher releases its handle and stops notifications on exit.
+			theme_watcher:close()
+		end,
+	})
+	load_theme()
 
 	-- Configure table-mode's Markdown-compatible corner character before the plugin creates tables.
 	vim.g.table_mode_corner = "|"
@@ -734,43 +691,6 @@ if plugin_loading_enabled then
 			})
 		end,
 	})
-
-	-- Configure Mason only for interactive sessions so headless checks do not start registry refreshes or installs.
-	if #vim.api.nvim_list_uis() > 0 then
-		require("mason").setup()
-
-		local registry = require("mason-registry")
-
-		-- List of packages to ensure are installed.
-		-- List of all packages: https://mason-registry.dev/registry/list
-		local ensure_installed = {
-			"lua-language-server",
-			"marksman",
-			"typos-lsp",
-		}
-
-		local function ensure_packages_installed()
-			-- Install configured Mason packages when missing so LSP dependencies self-heal during interactive startup.
-			for _, pkg_name in ipairs(ensure_installed) do
-				local pkg = registry.get_package(pkg_name)
-				if not pkg:is_installed() then
-					-- Schedule the installation so startup is not blocked by Mason package downloads.
-					pkg:install():on("after_success", function()
-						vim.notify(("Package '%s' installed successfully"):format(pkg_name), vim.log.levels.INFO)
-					end)
-				end
-			end
-		end
-
-		-- Refresh the registry before installing packages so interactive startup still self-heals without throwing in restricted headless runs.
-		registry.refresh(function(success)
-			-- Skip automatic installs when the registry refresh fails because package metadata may be unavailable.
-			if not success then
-				return
-			end
-			ensure_packages_installed()
-		end)
-	end
 end
 
 -- Native LSP configuration uses ~/.config/nvim/lsp/*.lua files and does not require a plugin wrapper.
@@ -784,15 +704,9 @@ vim.diagnostic.config({
 vim.api.nvim_create_autocmd("LspAttach", {
 	group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 	callback = function(ev)
-		local bufnr = ev.buf
-
-		local function map(mode, lhs, rhs, opts)
+		local function map(mode, lhs, rhs)
 			-- Apply a consistent buffer-local LSP mapping shape for every attached server.
-			opts = opts or {}
-			opts.buffer = bufnr
-			opts.noremap = true
-			opts.silent = true
-			vim.keymap.set(mode, lhs, rhs, opts)
+			vim.keymap.set(mode, lhs, rhs, { buffer = ev.buf, silent = true })
 		end
 
 		-- LSP keybindings.
@@ -827,7 +741,4 @@ local servers = {
 	-- "harper_ls",
 }
 
-for _, server in ipairs(servers) do
-	-- Start each configured server through Nvim's native LSP manager instead of an LSP config plugin.
-	vim.lsp.enable(server)
-end
+vim.lsp.enable(servers)

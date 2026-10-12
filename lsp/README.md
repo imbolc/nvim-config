@@ -63,8 +63,8 @@ settings are needed; Neovim defaults them to an empty table.
 1. Create a new `.lua` file named after the LSP server
 2. Configure the server settings in the file
 3. Add the server name to the `servers` table in `init.lua`
-4. Add to mason-lspconfig's `ensure_installed` if you want automatic
-   installation
+4. Add its installation command to `install.sh`; language servers are installed
+   separately from Neovim startup
 
 Example for a new server called `my_server`:
 

@@ -32,6 +32,8 @@ vim --appimage-extract-and-run --headless -u NONE -i NONE -l tests/open_todo.lua
 # Check native LSP defaults and both SQL injection string forms.
 vim --appimage-extract-and-run --headless -u NONE -i NONE -l tests/lsp_defaults.lua
 vim --appimage-extract-and-run --headless -u NONE -i NONE -l tests/sql_injections.lua
+# Check first-run theme watching and recovery from invalid theme edits.
+vim --appimage-extract-and-run --headless -u NONE -i NONE -l tests/theme.lua
 
 # Health
 vim --appimage-extract-and-run --headless -c checkhealth -c quit

@@ -17,8 +17,8 @@ sudo apt install -y shfmt                       # formatter
 sudo npm install -g bash-language-server@latest # LSP, uses shellcheck
 
 # Spelling / Grammar
-cargo install --locked --quiet typos-cli # LSP
-cargo install --locked --quiet harper-ls # LSP
+cargo install --locked --quiet typos-cli typos-lsp # spell checker CLI and LSP
+cargo install --locked --quiet harper-ls           # LSP
 
 # Markdown
 cargo install --locked --quiet comrak # renderer
@@ -47,3 +47,11 @@ cargo install --locked topcoat-cli
 
 # Python
 uv tool install ruff@latest # linter, formatter and LSP
+
+# Check Homebrew only after the other dependencies have been installed.
+if ! command -v brew >/dev/null 2>&1; then
+    printf '%s\n' 'Error: brew is required to install lua-language-server and marksman and must be on PATH.' >&2
+    echo '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'
+    exit 1
+fi
+brew install lua-language-server marksman
