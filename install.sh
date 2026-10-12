@@ -5,7 +5,7 @@ set -eux
 sudo npm install -g prettier@latest yaml-unist-parser@latest # formatter
 sudo npm install -g @biomejs/biome@latest                    # formatter, LSP
 
-sudo apt install cmake
+sudo apt install cmake libclang-dev
 cargo install deno --locked
 
 # Vue
@@ -34,9 +34,6 @@ cargo install --locked --quiet tree-sitter-cli # parser compiler used by nvim-tr
 # Toml
 cargo install --locked --quiet taplo-cli # formatter
 
-# Python
-pipx install ruff # linter, formatter and LSP
-
 # `fzf-lua`
 cargo install --locked --quiet bat fd-find ripgrep skim
 
@@ -47,3 +44,6 @@ cargo install --locked sleek # formatter
 rustup component add rust-analyzer
 rustup component add rustfmt --toolchain nightly
 cargo install --locked topcoat-cli
+
+# Python
+uv tool install ruff@latest # linter, formatter and LSP
