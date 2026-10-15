@@ -387,21 +387,17 @@ vim.api.nvim_create_autocmd("VimEnter", {
 -- Plugins --
 -------------
 local plugins = {
-	{ src = "https://github.com/mechatroner/rainbow_csv" },
-	{ src = "https://github.com/junegunn/vim-slash" }, -- Automatically remove search selection.
-	{ src = "https://github.com/pappasam/papercolor-theme-slim" },
 	{ src = "https://github.com/dhruvasagar/vim-table-mode" },
-	{ src = "https://github.com/saecki/crates.nvim" },
-	{ src = "https://github.com/stevearc/oil.nvim" },
-	{ src = "https://github.com/stevearc/conform.nvim" },
-	{
-		-- Use the active branch because the frozen master branch crashes on Markdown highlighting in Nvim 0.12.
-		src = "https://github.com/nvim-treesitter/nvim-treesitter",
-		version = "main",
-	},
 	{ src = "https://github.com/ibhagwan/fzf-lua" },
 	{ src = "https://github.com/j-hui/fidget.nvim" },
+	{ src = "https://github.com/junegunn/vim-slash" }, -- Automatically remove search selection.
+	{ src = "https://github.com/mechatroner/rainbow_csv" },
 	{ src = "https://github.com/nativerv/cyrillic.nvim" },
+	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
+	{ src = "https://github.com/saecki/crates.nvim" },
+	{ src = "https://github.com/sainnhe/everforest" },
+	{ src = "https://github.com/stevearc/conform.nvim" },
+	{ src = "https://github.com/stevearc/oil.nvim" },
 }
 
 -- Respect --noplugin by skipping package installation, loading, and plugin-specific setup when plugin loading is disabled.
@@ -445,7 +441,7 @@ if plugin_loading_enabled then
 	})
 
 	-- Load the configured colorscheme after vim.pack makes the theme package available.
-	vim.cmd([[colorscheme PaperColorSlim]])
+	vim.cmd([[colorscheme everforest]])
 
 	-- Load and watch the persisted theme after colorscheme packages are available.
 	local theme_file = vim.fn.expand("~/.config/nvim/theme.lua")
