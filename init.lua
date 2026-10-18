@@ -52,6 +52,10 @@ vim.opt.updatetime = 100
 vim.keymap.set("x", "<", "<gv", { silent = true })
 vim.keymap.set("x", ">", ">gv", { silent = true })
 
+-- Ignore Ctrl+Space and its Ctrl+@ encoding so accidental presses do not repeat text or leave Insert mode.
+vim.keymap.set("i", "<C-Space>", "<Nop>", { silent = true })
+vim.keymap.set("i", "<C-@>", "<Nop>", { silent = true })
+
 -- Let native autocomplete open completion menus while typing so this config does not need a custom TextChangedI trigger.
 vim.opt.completeopt = { "menu", "menuone", "noselect", "popup", "fuzzy" }
 vim.opt.autocomplete = true
