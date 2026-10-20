@@ -607,34 +607,37 @@ if plugin_loading_enabled then
 		install_dir = vim.fn.stdpath("data") .. "/site",
 	})
 
-	-- Install the Bash parser and queries so Markdown sh fences and shell buffers get Tree-sitter highlighting.
-	treesitter.install({ "bash" })
+	-- Share the supported filetypes so parser installation and highlighting stay in sync.
+	local treesitter_filetypes = {
+		"css",
+		"html",
+		"javascript",
+		"json",
+		"json5",
+		"jsonc",
+		"lua",
+		"markdown",
+		"python",
+		"query",
+		"rust",
+		"scss",
+		"sh",
+		"sql",
+		"svelte",
+		"toml",
+		"typescript",
+		"vue",
+		"yaml",
+	}
+
+	-- Resolve aliases such as sh to bash and jsonc to json before installing parsers and their dependencies.
+	treesitter.install(vim.tbl_map(vim.treesitter.language.get_lang, treesitter_filetypes))
 
 	-- Enable native Nvim Tree-sitter highlighting for filetypes whose parsers are managed by nvim-treesitter or bundled with Nvim.
 	vim.api.nvim_create_autocmd("FileType", {
-		pattern = {
-			"css",
-			"html",
-			"javascript",
-			"json",
-			"json5",
-			"jsonc",
-			"lua",
-			"markdown",
-			"python",
-			"query",
-			"rust",
-			"scss",
-			"sh",
-			"sql",
-			"svelte",
-			"toml",
-			"typescript",
-			"vue",
-			"yaml",
-		},
+		pattern = treesitter_filetypes,
 		callback = function()
-			-- Skip buffers whose parser is not installed yet so opening files stays error-free until :TSInstall/:TSUpdate provides it.
+			-- Keep files usable while missing parsers install asynchronously.
 			if not pcall(vim.treesitter.start) then
 				return
 			end

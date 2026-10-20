@@ -18,6 +18,6 @@ ln -s ~/proj/nvim-config ~/.config/nvim
 
 ```sh
   vim --appimage-extract-and-run --headless \
-    -c 'lua vim.pack.del(vim.iter(vim.pack.get()):filter(function(p) return not p.active end):map(function(p) return p.spec.name end):totable())' \
-    -c 'qa'
+      -c 'lua vim.pack.del(vim.iter(vim.pack.get()):filter(function(p) return not p.active end):map(function(p) return p.spec.name end):totable())' \
+      -c 'qa'
 ```
