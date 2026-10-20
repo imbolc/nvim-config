@@ -578,8 +578,8 @@ if plugin_loading_enabled then
 				require_cwd = true,
 			},
 			rumdl = {
-				-- Emit only formatted Markdown and let rumdl resolve user or project settings for the buffer.
-				append_args = { "--silent", "--stdin-filename", "$FILENAME" },
+				-- Emit only formatted Markdown; Conform already passes the buffer filename for config discovery.
+				append_args = { "--silent" },
 			},
 			-- sleek = {
 			-- 	command = "sleek",
@@ -606,6 +606,9 @@ if plugin_loading_enabled then
 	treesitter.setup({
 		install_dir = vim.fn.stdpath("data") .. "/site",
 	})
+
+	-- Install the Bash parser and queries so Markdown sh fences and shell buffers get Tree-sitter highlighting.
+	treesitter.install({ "bash" })
 
 	-- Enable native Nvim Tree-sitter highlighting for filetypes whose parsers are managed by nvim-treesitter or bundled with Nvim.
 	vim.api.nvim_create_autocmd("FileType", {
