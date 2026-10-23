@@ -21,3 +21,11 @@ ln -s ~/proj/nvim-config ~/.config/nvim
       -c 'lua vim.pack.del(vim.iter(vim.pack.get()):filter(function(p) return not p.active end):map(function(p) return p.spec.name end):totable())' \
       -c 'qa'
 ```
+
+## Ignored, but searchable `.var` folder
+
+```sh
+mkdir -p ./var
+&& printf '%s\n' '*' >./var/.gitignore
+&& printf '%s\n' '!*' >./var/.ignore
+```
