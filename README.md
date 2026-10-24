@@ -26,6 +26,6 @@ ln -s ~/proj/nvim-config ~/.config/nvim
 
 ```sh
 mkdir -p ./var
-&& printf '%s\n' '*' >./var/.gitignore
-&& printf '%s\n' '!*' >./var/.ignore
+printf '%s\n' '*' >./var/.gitignore
+printf '%s\n' '!*' >./var/.ignore
 ```
