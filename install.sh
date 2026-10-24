@@ -38,7 +38,7 @@ cargo install --locked --quiet taplo-cli # formatter
 cargo install --locked --quiet bat fd-find ripgrep skim
 
 # Sql
-cargo install --locked sleek # formatter
+cargo install --locked sqruff # formatter
 
 # Rust
 rustup component add rust-analyzer

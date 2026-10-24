@@ -534,7 +534,8 @@ if plugin_loading_enabled then
 			-- Format Rust normally before formatting Topcoat macros in opted-in projects.
 			rust = { "rustfmt_nightly", "topcoat" },
 			sh = { "shfmt" },
-			-- sql = { "sleek" },
+			-- Format SQL with sqruff through the existing format-on-save pipeline.
+			sql = { "sqruff" },
 			toml = { "taplo" },
 			vue = { "global_prettier" },
 			yaml = { "global_prettier" },
@@ -581,10 +582,6 @@ if plugin_loading_enabled then
 				-- Emit only formatted Markdown; Conform already passes the buffer filename for config discovery.
 				append_args = { "--silent" },
 			},
-			-- sleek = {
-			-- 	command = "sleek",
-			-- 	stdin = true,
-			-- },
 		},
 		format_on_save = {
 			-- Allow time for Markdown and injected code formatters to finish before saving.
