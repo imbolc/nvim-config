@@ -741,7 +741,8 @@ local servers = {
 	"rust_analyzer",
 	"typos_lsp",
 	"vuels",
-	-- "harper_ls",
+	-- Check grammar with Harper using the existing language and dictionary settings.
+	"harper_ls",
 }
 
 vim.lsp.enable(servers)

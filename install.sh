@@ -2,9 +2,10 @@
 set -eux
 
 # CSS, JS
-sudo npm install -g prettier@latest yaml-unist-parser@latest # formatter
-sudo npm install -g @biomejs/biome@latest                    # formatter, LSP
+sudo npm install -g prettier@latest       # formatter
+sudo npm install -g @biomejs/biome@latest # formatter, LSP
 
+# Deno
 sudo apt install cmake libclang-dev
 cargo install deno --locked
 
@@ -17,8 +18,8 @@ sudo apt install -y shfmt                       # formatter
 sudo npm install -g bash-language-server@latest # LSP, uses shellcheck
 
 # Spelling / Grammar
-cargo install --locked --quiet typos-cli typos-lsp # spell checker CLI and LSP
-cargo install --locked --quiet harper-ls           # LSP
+cargo install --locked --quiet typos-lsp # spell checker LSP
+cargo install --locked --quiet harper-ls # grammar LSP
 
 # Markdown
 cargo install --locked --quiet comrak # renderer
