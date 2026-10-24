@@ -1,11 +1,11 @@
 return {
 	cmd = { "harper-ls", "--stdio" },
+	-- Harper cannot parse CSS, YAML, JSON, or Vimscript, so keep it detached from those buffers.
 	filetypes = {
 		"markdown",
 		"text",
 		"gitcommit",
 		"html",
-		"css",
 		"javascript",
 		"typescript",
 		"lua",
@@ -15,13 +15,14 @@ return {
 		"java",
 		"c",
 		"cpp",
-		"yaml",
-		"json",
 		"toml",
-		"vim",
 		"sh",
 		"bash",
 	},
+	-- Translate Neovim's shell filetypes so Harper can parse and check their comments.
+	get_language_id = function(_, filetype)
+		return (filetype == "sh" or filetype == "bash") and "shellscript" or filetype
+	end,
 	root_markers = {
 		".harper.toml",
 		".harper.json",
@@ -32,7 +33,6 @@ return {
 		"Cargo.toml",
 		"pyproject.toml",
 	},
-	single_file_support = true,
 	settings = {
 		["harper-ls"] = {
 			userDictPath = vim.fn.stdpath("config") .. "/spell/en.utf-8.add",
