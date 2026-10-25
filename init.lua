@@ -529,10 +529,8 @@ if plugin_loading_enabled then
 				return { "injected", "rumdl" }
 			end,
 			python = { "ruff_format", "ruff_organize_imports" },
-			-- rust `injected` breaks Maud templates.
-			-- rust = { "rustfmt_nightly", "injected" },
-			-- Format Rust normally before formatting Topcoat macros in opted-in projects.
-			rust = { "rustfmt_nightly", "topcoat" },
+			-- Format Rust and opted-in Topcoat macros, then injected code such as SQLx queries.
+			rust = { "rustfmt_nightly", "topcoat", "injected" },
 			sh = { "shfmt" },
 			-- Format SQL with sqruff through the existing format-on-save pipeline.
 			sql = { "sqruff" },
