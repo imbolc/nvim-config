@@ -392,10 +392,10 @@ vim.api.nvim_create_autocmd("VimEnter", {
 -------------
 local plugins = {
 	{ src = "https://github.com/dhruvasagar/vim-table-mode" },
+	{ src = "https://github.com/hat0uma/csvview.nvim" }, -- Display CSV/TSV files as tables with borders.
 	{ src = "https://github.com/ibhagwan/fzf-lua" },
 	{ src = "https://github.com/j-hui/fidget.nvim" },
 	{ src = "https://github.com/junegunn/vim-slash" }, -- Automatically remove search selection.
-	{ src = "https://github.com/mechatroner/rainbow_csv" },
 	{ src = "https://github.com/nativerv/cyrillic.nvim" },
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
 	{ src = "https://github.com/saecki/crates.nvim" },
@@ -487,6 +487,17 @@ if plugin_loading_enabled then
 
 	-- Configure table-mode's Markdown-compatible corner character before the plugin creates tables.
 	vim.g.table_mode_corner = "|"
+
+	-- Use bordered columns and enable CSVView automatically when CSV or TSV buffers open.
+	local csvview = require("csvview")
+	csvview.setup({ view = { display_mode = "border" } })
+	vim.api.nvim_create_autocmd("FileType", {
+		group = vim.api.nvim_create_augroup("csvview-auto-enable", { clear = true }),
+		pattern = { "csv", "tsv" },
+		callback = function(ev)
+			csvview.enable(ev.buf)
+		end,
+	})
 
 	-- Configure crates.nvim only on the first Cargo.toml read.
 	vim.api.nvim_create_autocmd("BufRead", {

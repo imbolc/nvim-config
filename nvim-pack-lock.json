@@ -8,6 +8,10 @@
       "rev": "7039bc1d130e424232a7aa64ceddb170a154ff5b",
       "src": "https://github.com/saecki/crates.nvim"
     },
+    "csvview.nvim": {
+      "rev": "f190de76d2eca0380ddcb2425cd582d740699b55",
+      "src": "https://github.com/hat0uma/csvview.nvim"
+    },
     "cyrillic.nvim": {
       "rev": "86186af29eed2af1a069f9e36140d116a2765c80",
       "src": "https://github.com/nativerv/cyrillic.nvim"
