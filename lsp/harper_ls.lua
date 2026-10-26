@@ -38,6 +38,8 @@ return {
 			userDictPath = vim.fn.stdpath("config") .. "/spell/en.utf-8.add",
 			linters = {
 				SentenceCapitalization = false,
+				-- Allow sentence case in headings without Harper suggesting title case.
+				UseTitleCase = false,
 			},
 			codeActions = {
 				ForceStable = true,
