@@ -8,6 +8,8 @@ vim.opt.mouse = ""
 vim.opt.autowrite = true -- automatically :write before running a commands
 vim.opt.spell = true
 vim.opt.spelllang = "en,ru"
+-- Keep zg additions in the custom word list shared with Harper instead of Neovim's default data directory.
+vim.opt.spellfile = vim.fn.stdpath("config") .. "/spell/en.utf-8.add"
 
 -- Backup
 vim.opt.writebackup = false
