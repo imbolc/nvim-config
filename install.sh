@@ -17,9 +17,8 @@ sudo apt install -y shellcheck                  # linter
 sudo apt install -y shfmt                       # formatter
 sudo npm install -g bash-language-server@latest # LSP, uses shellcheck
 
-# Spelling / Grammar
+# Spelling
 cargo install --locked --quiet typos-lsp # spell checker LSP
-cargo install --locked --quiet harper-ls # grammar LSP
 
 # Markdown
 cargo install --locked --quiet comrak # renderer

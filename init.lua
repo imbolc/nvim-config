@@ -8,7 +8,7 @@ vim.opt.mouse = ""
 vim.opt.autowrite = true -- automatically :write before running a commands
 vim.opt.spell = true
 vim.opt.spelllang = "en,ru"
--- Keep zg additions in the custom word list shared with Harper instead of Neovim's default data directory.
+-- Store zg additions in the repo
 vim.opt.spellfile = vim.fn.stdpath("config") .. "/spell/en.utf-8.add"
 
 -- Backup
@@ -752,8 +752,6 @@ local servers = {
 	"rust_analyzer",
 	"typos_lsp",
 	"vuels",
-	-- Check grammar with Harper using the existing language and dictionary settings.
-	"harper_ls",
 }
 
 vim.lsp.enable(servers)
