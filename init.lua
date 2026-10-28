@@ -492,7 +492,14 @@ if plugin_loading_enabled then
 
 	-- Use bordered columns and enable CSVView automatically when CSV or TSV buffers open.
 	local csvview = require("csvview")
-	csvview.setup({ view = { display_mode = "border" } })
+	-- Fit CSV columns to their contents without extra padding.
+	csvview.setup({
+		view = {
+			display_mode = "border",
+			min_column_width = 1,
+			spacing = 0,
+		},
+	})
 	vim.api.nvim_create_autocmd("FileType", {
 		group = vim.api.nvim_create_augroup("csvview-auto-enable", { clear = true }),
 		pattern = { "csv", "tsv" },
